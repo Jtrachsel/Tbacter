@@ -43,16 +43,32 @@ meta$tbact <- ifelse(meta$genus == 'Turicibacter', TRUE, FALSE)
 
 p <- rotate(p,187)
 p <- rotate(p, 260)
+p <- rotate(p, 270)
 
 p <- p %<+% meta
+p + geom_text(aes(label=node))
+
+tips <- p$data[p$data$isTip,]
+tips[is.na(tips$tbact),]$tbact <- FALSE
 
 p + geom_hilight(node = 187, extend = .05) + geom_tree() + 
   geom_tippoint(aes(color=phylum), size=3) +
-  geom_point2(aes(subset = tbact), size=5, fill='gold', shape=25) +
-  theme(legend.position = c(0.6,0.2)) #+ geom_text(aes(label=node))
+  geom_point2(aes(subset = tbact), size=4, fill='gold', shape=25) +
+  theme(legend.position = c(0.6,0.2)) + annotate(geom='point') 
 
 
-p$data$tbact
+tbacts <- tips[tips$tbact,]
+tbacts$source <- ifelse(is.na(tbacts$excluded_from_refseq), 'isolate', 'metagenome')
+
+
+# library(ggrepel)
+p + geom_hilight(node = 187, extend = .05) + geom_tree() + 
+  geom_tippoint(aes(color=phylum), size=3) +
+  geom_point(data = tbacts,aes(fill=source), size=4, shape=25) +
+  scale_fill_manual(name='Turicibacter', values = c('gold', 'red'))+
+  theme(legend.position = c(0.6,0.2)) 
+
+# p$data[p$data$tbact,]
 
 
 
@@ -64,10 +80,6 @@ p %<+% meta +
   ggtitle('Node 187')
 
 
-
-
-
-geom_text2(aes(subset=!isTip, label=label), hjust=-.2, size=4)
 
 
 
